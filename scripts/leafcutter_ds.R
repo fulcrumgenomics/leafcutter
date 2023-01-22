@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 library(optparse)
 library(leafcutter)
+library(stringi)
 
 arguments <- parse_args(OptionParser(usage = "%prog [options] counts_file groups_file", description="LeafCutter differential splicing command line tool. Required inputs:\n <counts_file>: Intron usage counts file. Must be .txt or .txt.gz, output from clustering pipeline.\n <groups_file>: Two+K column file: 1. sample names (must match column names in counts_file), 2. groups (currently only two groups, i.e. pairwise, supported. Some samples in counts_file can be missing from this file, in which case they will not be included in the analysis. Additional columns can be used to specify confounders, e.g. batch/sex/age. Numeric columns will be treated as continuous, so use e.g. batch1, batch2, batch3 rather than 1, 2, 3 if you a categorical variable.",option_list=list(
   make_option(c("-o","--output_prefix"), default = "leafcutter_ds", help="The prefix for the two output files, <prefix>_cluster_significance.txt (containing test status, log likelihood ratio, degree of freedom, and p-value for each cluster) and <prefix>_effect_sizes.txt (containing the effect sizes for each intron)  [default %default]"),
@@ -90,7 +91,13 @@ write.table( cluster_table, paste0(opt$output_prefix,"_cluster_significance.txt"
 
 # Write effect size table
 effect_size_table                = leaf_cutter_effect_sizes(results)
-colnames(effect_size_table)[3:4] = group_names
+
+colnames(effect_size_table) = stri_replace_all_regex(
+    colnames(effect_size_table),
+    c("baseline","perturbed"),
+    group_names,
+    vectorize_all = FALSE)
+
 effect_size_table$intron = add_chr(effect_size_table$intron)
 write.table( effect_size_table, paste0(opt$output_prefix,"_effect_sizes.txt"), quote=F, col.names = T, row.names = F, sep="\t")
 
