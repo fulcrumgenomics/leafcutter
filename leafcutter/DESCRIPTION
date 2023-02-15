@@ -2,7 +2,7 @@ Package: leafcutter
 Type: Package
 Title: Alternative splicing quantification, differential splicing, 
     outlier splicing detection, and splicing QTL mapping
-Version: 0.2.9
+Version: 0.2.9.4
 Date: 2020-04-15
 Authors@R: c(person("David", "Knowles", email = "dak2173@columbia.edu", role = c("aut", "cre")),
               person("Yang", "Li", role = c("aut", "cre")),
@@ -51,7 +51,8 @@ LinkingTo:
 RoxygenNote: 7.1.1
 Encoding: UTF-8
 Suggests: knitr,
-    rmarkdown
+    rmarkdown,
+    stringi
 VignetteBuilder: knitr
 NeedsCompilation: yes
 SystemRequirements: GNU make
