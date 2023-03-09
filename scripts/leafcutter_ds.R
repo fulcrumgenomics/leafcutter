@@ -28,7 +28,7 @@ if (!file.exists(groups_file)) stop("File ",groups_file," does not exist")
 meta=read.table(groups_file, header=F, stringsAsFactors = F)
 colnames(meta)[1:2]=c("sample","group")
 
-counts=counts[,meta$sample]
+counts=counts[,as.character(meta$sample)]
 
 group_names=unique(meta$group) # keep order from groups_file unless numeric
 if (is.numeric(meta$group)) group_names=sort(group_names)
