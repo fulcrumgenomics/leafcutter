@@ -77,7 +77,7 @@ if(file.exists(groups_file)){ # can we run without this?
 exons_table=if (!is.null( exon_file )) {
   cat("Loading exons from",exon_file,"\n")
   #read_table(exon_file)
-  as.data.frame(fread(paste("zless",exon_file)), data.table=F )
+  as.data.frame(fread(cmd=paste("zless",exon_file)), data.table=F )
 } else {
   cat("No exon_file provided.\n")
   NULL
@@ -120,20 +120,20 @@ all.introns$end <- as.numeric(all.introns$end)
 ## intersect with list of junctions
 all.junctions <- dplyr::select(all.introns, chr, start, end, clusterID)
 
-intron_db <- fread(paste0("zcat < ", all_introns), data.table = FALSE)
+intron_db <- fread(cmd=paste0("zcat < ", all_introns), data.table = FALSE)
 colnames(intron_db)[1:4]=c("chr","start","end","gene")
 intron_db$chr <- leafcutter::add_chr(intron_db$chr)
 all.introns_intersect = all.junctions %>%
   left_join(intron_db, by=c("chr","start","end"))
 
-threeprime_db <- fread(paste0("zcat < ", threeprime_file), data.table = FALSE)
+threeprime_db <- fread(cmd=paste0("zcat < ", threeprime_file), data.table = FALSE)
 colnames(threeprime_db)[1:7]=c("chr","start","end","gene","gene_id","strand","transcript")
 threeprime_db$chr <- leafcutter::add_chr(intron_db$chr)
 threeprime_intersect = all.junctions %>%
   select(chr, clusterID, start=end) %>%
   left_join(threeprime_db, by=c("chr","start"))
 
-fiveprime_db <- fread(paste0("zcat < ", fiveprime_file), data.table = FALSE)
+fiveprime_db <- fread(cmd=paste0("zcat < ", fiveprime_file), data.table = FALSE)
 colnames(fiveprime_db)[1:7]=c("chr","start","end","gene","gene_id","strand","transcript")
 fiveprime_db$chr <- leafcutter::add_chr(fiveprime_db$chr)
 fiveprime_intersect =  all.junctions %>%
