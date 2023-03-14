@@ -49,13 +49,13 @@ leaf_cutter_effect_sizes=function(results) {
                    stringsAsFactors = F ) %>% 
       mutate(baseline=normalize(baseline_a),
              perturbed=normalize(perturbed_a),
-             baseline_psi_se=a_to_se(baseline_a),
-             perturbed_psi_se=a_to_se(perturbed_a)
+             baseline_se=a_to_se(baseline_a),
+             perturbed_se=a_to_se(perturbed_a)
              )
     }
   } %>%
   mutate( deltapsi=perturbed-baseline) %>%
-  select(intron,logef,baseline,perturbed, deltapsi, everything())
+  select(intron, logef, baseline, perturbed, deltapsi, baseline_se, perturbed_se)
 }
 
 
