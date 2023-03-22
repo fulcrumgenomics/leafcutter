@@ -33,18 +33,29 @@ beta_real=function(r)
 leaf_cutter_effect_sizes=function(results) {
   normalize=function(g) { g/sum(g) }
   softmax=function(g) normalize(exp(g))
-  to_psi=function(b,conc) { normalize(softmax(b)*conc) }
+  to_a=function(b,conc) { softmax(b)*conc }
+  to_psi=function(b,conc) { normalize(to_a(b,conc)) }
+  a_to_se=function(a){ # standard error vector of a Dirichlet distribution with parameters a
+    a_tilde=normalize(a)
+    sqrt(a_tilde*(1-a_tilde)/(sum(a)+1)) 
+  }
   foreach(res=results, .combine = bind_rows) %do% {
     if ( is.character(res) | ("error" %in% class(res)) ) NULL else {
        beta=beta_real( res$fit_full$par )
        data.frame( intron=colnames(beta),
                    logef=beta[2,],
-                   baseline=to_psi(beta[1,],res$fit_full$par$conc),
-                   perturbed=to_psi(beta[1,]+beta[2,],res$fit_full$par$conc),
-                   stringsAsFactors = F )
+                   baseline_a=to_a(beta[1,],res$fit_full$par$conc),
+                   perturbed_a=to_a(beta[1,]+beta[2,],res$fit_full$par$conc), 
+                   stringsAsFactors = F ) %>% 
+      mutate(baseline=normalize(baseline_a),
+             perturbed=normalize(perturbed_a),
+             baseline_se=a_to_se(baseline_a),
+             perturbed_se=a_to_se(perturbed_a)
+             )
     }
   } %>%
-  mutate( deltapsi=perturbed-baseline)
+  mutate( deltapsi=perturbed-baseline) %>%
+  select(intron, logef, baseline, perturbed, deltapsi, baseline_se, perturbed_se)
 }
 
 
